@@ -1,0 +1,241 @@
+<!DOCTYPE html> 
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro Sistema</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        /* Estilos previos */
+        body {
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #007bff;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+        .container {
+            text-align: center;
+            width: calc(100% - 60px);
+            max-width: 400px;
+            margin: 0 30px;
+        }
+        .logo {
+            margin-bottom: 50px;
+        }
+        .logo img {
+            width: 180px;
+            height: auto;
+        }
+        .group {
+            display: flex;
+            line-height: 30px;
+            align-items: center;
+            position: relative;
+            margin-bottom: 20px;
+            max-width: 100%;
+        }
+        .input {
+            width: 100%;
+            height: 45px;
+            line-height: 30px;
+            padding-left: 3rem;
+            border: 2px solid transparent;
+            border-radius: 10px;
+            outline: none;
+            background-color: #f8fafc;
+            color: #0d0c22;
+            transition: .5s ease;
+        }
+        .input::placeholder {
+            color: #94a3b8;
+        }
+        .input:focus, .input:hover {
+            outline: none;
+            border-color: rgba(129, 140, 248);
+            background-color: #fff;
+            box-shadow: 0 0 0 5px rgb(129 140 248 / 30%);
+        }
+        .icon {
+            position: absolute;
+            left: 1rem;
+            font-size: 1.5rem;
+            color: #007bff;
+        }
+        #error-message {
+            color: red;
+            display: none;
+            margin-bottom: 10px;
+        }
+        button {
+            --color: #3b69da;
+            font-family: inherit;
+            display: inline-block;
+            width: 8em;
+            height: 2.6em;
+            line-height: 2.5em;
+            margin: 20px;
+            position: relative;
+            cursor: pointer;
+            overflow: hidden;
+            border: 2px solid var(--color);
+            transition: color 0.5s;
+            z-index: 1;
+            font-size: 17px;
+            border-radius: 6px;
+            font-weight: 500;
+            color: var(--color);
+        }
+        button:hover {
+            color: #fff;
+        }
+        .forgot-password {
+            font-size: 14px;
+            color: #fff;
+            margin-bottom: 40px;
+        }
+        .footer {
+            font-size: 14px;
+            color: #fff;
+        }
+        .loader {
+            --dim: 3rem;
+            width: var(--dim);
+            height: var(--dim);
+            position: relative;
+            animation: spin988 2s linear infinite;
+            display: none;
+            margin: 20px auto;
+        }
+        @keyframes spin988 {
+            0% { transform: scale(1) rotate(0); }
+            20%, 25% { transform: scale(1.3) rotate(90deg); }
+            45%, 50% { transform: scale(1) rotate(180deg); }
+            70%, 75% { transform: scale(1.3) rotate(270deg); }
+            95%, 100% { transform: scale(1) rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <img alt="Logo con marca de verificación" src="https://www.app.studiokreattivo.com.co/wp-content/uploads/2024/10/Registration-System-logo.png" />
+        </div>
+        <div class="group">
+            <i class="fa fa-envelope icon"></i>
+            <input class="input" id="email" placeholder="Email" type="email" required />
+        </div>
+        <div class="group">
+            <i class="fa fa-lock icon"></i>
+            <input class="input" id="password" placeholder="Contraseña" type="password" required />
+        </div>
+        <div id="error-message">Usuario o contraseña incorrecto</div>
+        <button id="submit" class="transition">Iniciar sesión</button>
+        <p class="forgot-password">¿Olvidaste tu contraseña?</p>
+        <div class="loader"></div>
+        <p class="footer">© 2024 Registration System</p>
+    </div>
+
+    <script>
+        // Comprobar si el usuario ya tiene una sesión activa y redirigir si está autenticado
+        window.onload = function() {
+            var token = localStorage.getItem('jwt_token');
+            if (token) {
+                // Verificar si el token es válido haciendo una solicitud a una ruta protegida
+                fetch('https://www.app.studiokreattivo.com.co/wp-json/wp/v2/users/me', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        // Si el token es válido, redirigir al área de inicio
+                        window.location.href = 'https://www.app.studiokreattivo.com.co/inicio/'; // Cambia a la URL correcta
+                    } else {
+                        // Si el token no es válido, eliminarlo y dejar al usuario en la página de login
+                        localStorage.removeItem('jwt_token');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    // Si ocurre algún error, eliminar el token para forzar un nuevo login
+                    localStorage.removeItem('jwt_token');
+                });
+            }
+        };
+
+        document.getElementById('submit').onclick = function() {
+            document.getElementById('error-message').style.display = 'none';
+            document.querySelector('.loader').style.display = 'block';
+
+            var email = document.getElementById('email').value;
+            var password = document.getElementById('password').value;
+
+            if (email.trim() === "" || password.trim() === "") {
+                document.getElementById('error-message').textContent = "Por favor, completa todos los campos.";
+                document.getElementById('error-message').style.display = 'block';
+                document.querySelector('.loader').style.display = 'none';
+                return;
+            }
+
+            var jwtURL = 'https://www.app.studiokreattivo.com.co/wp-json/jwt-auth/v1/token';
+
+            fetch(jwtURL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username: email, password: password })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error en la autenticación');
+                }
+                return response.json();
+            })
+            .then(data => {
+                document.querySelector('.loader').style.display = 'none';
+                if (data.token) {
+                    // Almacena el token en localStorage para persistencia
+                    localStorage.setItem('jwt_token', data.token);
+
+                    // Autenticar con WordPress para establecer la sesión
+                    return fetch('https://www.app.studiokreattivo.com.co/wp-login.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: new URLSearchParams({
+                            log: email,
+                            pwd: password,
+                            testcookie: '1',
+                            redirect_to: 'https://www.app.studiokreattivo.com.co/inicio/' // Cambiado aquí
+                        })
+                    });
+                } else {
+                    document.getElementById('error-message').textContent = "Usuario o contraseña incorrecto.";
+                    document.getElementById('error-message').style.display = 'block';
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error al autenticar en WordPress');
+                }
+                // Redirigir a la página de inicio
+                window.location.href = 'https://www.app.studiokreattivo.com.co/inicio/';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.querySelector('.loader').style.display = 'none';
+                document.getElementById('error-message').textContent = "Hubo un error con el servidor. Inténtalo de nuevo.";
+                document.getElementById('error-message').style.display = 'block';
+            });
+        };
+    </script>
+</body>
+</html>

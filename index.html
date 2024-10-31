@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Web Page</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #ffffff;
+        }
+        .header {
+            background-color: #007bff;
+            color: white;
+            padding: 30px;
+            text-align: left;
+            position: relative;
+        }
+        .header i {
+            position: absolute;
+            right: 27px;
+            top: 25px;
+            font-size: 33px;
+        }
+        .container {
+            padding: 20px;
+        }
+        .button {
+            background-color: #007bff;
+            color: white;
+            padding: 30px 20px;
+            margin: 17px 0;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-decoration: none;
+            font-size: 18px;
+        }
+        .button i {
+            font-size: 24px;
+        }
+        .footer {
+            background-color: #ffffff;
+            padding: 20px;
+            display: flex;
+            justify-content: space-around;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            box-shadow: 0 -4px 6px -2px rgba(0, 0, 0, 0.1);
+        }
+        .footer i {
+            color: #007bff;
+            font-size: 35px;
+        }
+    </style>
+    <script>
+        // URL de la API REST de WordPress
+        var wordpressApiUrl = 'https://www.app.studiokreattivo.com.co/wp-json/wp/v2/users/me';
+
+        // Verifica si el usuario ha iniciado sesión en WordPress
+        function checkWordPressLogin() {
+            fetch(wordpressApiUrl, {
+                method: 'GET',
+                credentials: 'include' // Incluye las cookies para autenticación
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.json(); // Si está autenticado, devuelve los datos del usuario
+                } else {
+                    console.warn('Usuario no autenticado');
+                    document.getElementById('userName').textContent = 'Hola, Usuario!'; // Muestra un mensaje genérico
+                }
+            })
+            .then(userData => {
+                console.log(userData); // Muestra los datos del usuario en la consola para verificar
+                if (userData && userData.name) {
+                    document.getElementById('userName').textContent = `Hola, ${userData.name}!`; // Muestra el nombre del usuario
+                } else if (userData && userData.username) {
+                    document.getElementById('userName').textContent = `Hola, ${userData.username}!`; 
+                } else if (userData && userData.display_name) {
+                    document.getElementById('userName').textContent = `Hola, ${userData.display_name}!`; 
+                }
+            })
+            .catch(error => {
+                console.error('Error verificando sesión de WordPress:', error);
+                document.getElementById('userName').textContent = 'Hola, Usuario!'; // Mensaje genérico en caso de error
+            });
+        }
+
+        // Función para redirigir sin validación
+        function validateAndRedirect(url) {
+            window.location.href = url; // Redirige sin validación
+        }
+
+        // Ejecutar la verificación al cargar la página
+        window.onload = checkWordPressLogin;
+    </script>
+</head>
+<body>
+    <div class="header" style="font-size: 20px;">
+        <span id="userName"><b>Bienvenido!</b></span> <!-- Aquí se mostrará el nombre del usuario -->
+        <i class="fas fa-user-circle"></i>
+    </div>
+
+    <div class="container">
+        <a href="https://www.app.studiokreattivo.com.co/cague-y-descargue/" class="button" onclick="validateAndRedirect('https://www.app.studiokreattivo.com.co/cague-y-descargue/')">
+            <span>CARGUE Y DESCARGUE</span>
+            <i class="fas fa-truck-loading"></i>
+        </a>
+        <a href="https://www.app.studiokreattivo.com.co/pausas-activas/" class="button" onclick="validateAndRedirect('https://www.app.studiokreattivo.com.co/pausas-activas/')">
+            <span>PAUSAS ACTIVAS</span>
+            <i class="fas fa-walking"></i>
+        </a>
+        <a href="#" class="button" onclick="validateAndRedirect('#')">
+            <span>FATIGA</span>
+            <i class="fas fa-tired"></i>
+        </a>
+        <a href="#" class="button" onclick="validateAndRedirect('#')">
+            <span>PREOPERACIONAL</span>
+            <i class="fas fa-truck"></i>
+        </a>
+    </div>
+
+    <div class="footer">
+        <a href="https://www.app.studiokreattivo.com.co/inicio2/">
+            <i class="fas fa-home"></i>
+        </a>
+        <a href="#">
+            <i class="fas fa-envelope"></i>
+        </a>
+        <a href="#">
+            <i class="fas fa-user"></i>
+        </a>
+        <a href="#">
+            <i class="fas fa-sign-out-alt"></i>
+        </a>
+    </div>
+</body>
+</html>

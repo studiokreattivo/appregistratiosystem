@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario de Registro Cargue y Descargue</title>
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #f5f7fa;
+            --text-color: #333;
+            --border-color: #e0e0e0;
+            --cancel-color: #e74c3c;
+            --success-color: #2ecc71;
+            --hover-primary: #3a7bd5;
+            --input-bg: #ffffff;
+            --label-color: #7f8c8d;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Roboto', sans-serif;
+            color: var(--text-color);
+            background: linear-gradient(135deg, #f6f8fa 0%, #e9ebee 100%);
+            min-height: 100vh;
+            display: contents;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: #ffffff;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 500px;
+            height: 750px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .form-header {
+            background-color: var(--primary-color);
+            color: #ffffff;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .form-header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .form-header p {
+            font-size: 16px;
+            opacity: 0.8;
+        }
+
+        .tab {
+            display: flex;
+            background-color: var(--secondary-color);
+        }
+
+        .tab button {
+            background-color: transparent;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 15px;
+            transition: 0.3s;
+            font-size: 16px;
+            flex: 1;
+            color: var(--text-color);
+            font-weight: 500;
+        }
+
+        .tab button:hover {
+            background-color: rgba(74, 144, 226, 0.1);
+        }
+
+        .tab button.active {
+            background-color: #ffffff;
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--primary-color);
+        }
+
+        .tabcontent {
+            display: none;
+            padding: 30px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .tabcontent.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group {
+            position: relative;
+            margin-bottom: 25px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--input-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+        }
+
+        .form-group label {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--label-color);
+            font-size: 16px;
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus + label,
+        .form-group input:not(:placeholder-shown) + label {
+            top: 0;
+            left: 10px;
+            font-size: 12px;
+            background-color: #ffffff;
+            padding: 0 5px;
+            color: var(--primary-color);
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: auto;
+            padding: 20px 30px;
+            background-color: #ffffff;
+        }
+
+        .button-group button {
+            padding: 12px 25px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .button-cancel {
+            background-color: var(--cancel-color);
+            color: #ffffff;
+        }
+
+        .button-cancel:hover {
+            background-color: #c0392b;
+        }
+
+        .button-register, .button-next {
+            background-color: var(--primary-color);
+            color: #ffffff;
+        }
+
+        .button-register:hover, .button-next:hover {
+            background-color: var(--hover-primary);
+        }
+
+        .message-area {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .message-area.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message-area.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .message-area.loading {
+            background-color: #e9ecef;
+            color: #495057;
+            border: 1px solid #ced4da;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="form-header">
+            <h1>Registro Cargue y Descargue</h1>
+            <p>Complete su información</p>
+        </div>
+        <form id="multiStepForm">
+            <div class="tab">
+                <button type="button" class="tablinks active" onclick="openTab(event, 'datosPersonales')">Datos Conductor</button>
+                <button type="button" class="tablinks" onclick="openTab(event, 'registrosCompania')">Registro Tiempo</button>
+            </div>
+
+            <div id="datosPersonales" class="tabcontent active">
+                <div class="form-group">
+                    <input type="text" id="nombre" name="nombre" required placeholder=" ">
+                    <label for="nombre">Nombre Conductor</label>
+                </div>
+                <div class="form-group">
+                    <input type="text" id="identificacion" name="identificacion" required placeholder=" ">
+                    <label for="identificacion">Identificación</label>
+                </div>
+                <div class="form-group">
+                    <input type="text" id="placa" name="placa" required placeholder=" ">
+                    <label for="placa">Placa</label>
+                </div>
+                <div class="form-group">
+                    <input type="date" id="fecharegistro" name="fecharegistro" required readonly placeholder=" ">
+                    <label for="fecharegistro">Fecha Registro</label>
+                </div>
+                <div class="form-group">
+                    <input type="time" id="horaregistro" name="horaregistro" required readonly placeholder=" ">
+                    <label for="horaregistro">Hora Registro</label>
+                </div>
+            </div>
+
+            <div id="registrosCompania" class="tabcontent">
+                <div class="form-group">
+                    <input type="time" id="horaInicioCargue" name="horaInicioCargue" required placeholder=" ">
+                    <label for="horaInicioCargue">Hora Inicio de Cargue</label>
+                </div>
+                <div class="form-group">
+                    <input type="time" id="horaSalidaCargue" name="horaSalidaCargue" required placeholder=" ">
+                    <label for="horaSalidaCargue">Hora Salida de Cargue</label>
+                </div>
+                <div class="form-group">
+                    <input type="time" id="horaInicioDescargue" name="horaInicioDescargue" required placeholder=" ">
+                    <label for="horaInicioDescargue">Hora Inicio Descargue</label>
+                </div>
+                <div class="form-group">
+                    <input type="time" id="horaSalidaDescargue" name="horaSalidaDescargue" required placeholder=" ">
+                    <label for="horaSalidaDescargue">Hora Salida Descargue</label>
+                </div>
+            </div>
+
+            <div class="message-area" id="messageArea" style="display: none;"></div>
+
+            <div class="button-group">
+                <button type="button" class="button-cancel" onclick="cancelar()">Cancelar</button>
+                <button type="button" class="button-next" onclick="goToNextTab()">Siguiente</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        const openTab = (evt, tabName) => {
+            const tabcontent = document.getElementsByClassName("tabcontent");
+            for (let i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+                tabcontent[i].classList.remove("active");
+            }
+            const tablinks = document.getElementsByClassName("tablinks");
+            for (let i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+            document.getElementById(tabName).style.display = "block";
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.className += " active";
+        };
+
+        const goToNextTab = () => {
+            const nextTab = document.getElementsByClassName("tablinks")[1];
+            openTab({currentTarget: nextTab}, 'registrosCompania');
+            document.querySelector('.button-next').textContent = 'Registrar';
+            document.querySelector('.button-next').onclick = submitForm;
+        };
+
+        const showMessage = (message, type) => {
+            const messageArea = document.getElementById('messageArea');
+            messageArea.textContent = message;
+            messageArea.className = `message-area ${type}`;
+            messageArea.style.display = 'block';
+        };
+
+        const hideMessage = () => {
+            document.getElementById('messageArea').style.display = 'none';
+        };
+
+        const validateForm = () => {
+            const requiredFields = document.querySelectorAll('#multiStepForm input[required]');
+            for (let field of requiredFields) {
+                if (!field.value) {
+                    showMessage(`Por favor, complete el campo ${field.previousElementSibling.textContent}`, 'error');
+                    return false;
+                }
+            }
+            return true;
+        };
+
+        const submitForm = () => {
+            if (!validateForm()) return;
+
+            const formData = new FormData(document.getElementById("multiStepForm"));
+            const data = Object.fromEntries(formData.entries());
+            
+            showMessage('Guardando registro...', 'loading');
+
+            // URL del script de Google Apps Script (reemplazar con la URL real)
+            const scriptUrl = 'https://script.google.com/macros/s/AKfycbwaVuYU472YBaNEqBgZa99AyDfyAOXL79yn1As4IRAVDG-o7CSB9L1aIha5fU-Hndk/exec';
+
+            fetch(scriptUrl, {
+                method: 'POST',
+                mode: 'no-cors',
+                cache: 'no-cache',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (response.ok) {
+                    showMessage('¡Registro guardado!', 'success');
+                    document.getElementById("multiStepForm").reset();
+                    openTab({currentTarget: document.getElementsByClassName("tablinks")[0]}, 'datosPersonales');
+                    setTimeout(hideMessage, 3000);
+                } else {
+                    throw new Error('Error en la respuesta del servidor');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showMessage('Hubo un error al enviar el registro. Por favor, intente de nuevo.', 'error');
+            });
+        };
+
+        const cancelar = () => {
+            if (confirm("¿Seguro que quieres cancelar? Se perderán todos los datos.")) {
+                document.getElementById("multiStepForm").reset();
+                openTab({currentTarget: document.getElementsByClassName("tablinks")[0]}, 'datosPersonales');
+            }
+        };
+
+        window.onload = () => {
+            document.getElementsByClassName("tablinks")[0].click();
+            const now = new Date();
+            const fecha = now.toISOString().substr(0, 10);
+            const hora = now.toTimeString().substr(0, 5);
+            document.getElementById('fecharegistro').value = fecha;
+            document.getElementById('horaregistro').value = hora;
+        };
+    </script>
+</body>
+</html>
